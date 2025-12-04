@@ -1,0 +1,72 @@
+name: Advanced - Upload audio (S3 event-driven)
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - "audio_inputs/**"
+      - ".github/workflows/advanced_upload_audio.yml"
+  push:
+    branches: [ main ]
+    paths:
+      - "audio_inputs/**"
+      - ".github/workflows/advanced_upload_audio.yml"
+
+jobs:
+  upload-audio:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Determine tier (beta on PR, prod on push)
+        id: tier
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "TIER=beta" >> "$GITHUB_OUTPUT"
+          else
+            echo "TIER=prod" >> "$GITHUB_OUTPUT"
+          fi
+          echo "ACTIVE_TIER=${{ steps.tier.outputs.TIER }}"
+
+      - name: Guard bucket secret present
+        shell: bash
+        run: |
+          if [[ -z "${{ secrets.S3_BUCKET }}" ]]; then
+            echo "::error::S3_BUCKET secret is empty or unset." >&2
+            exit 1
+          fi
+          echo "Bucket: ${{ secrets.S3_BUCKET }}"
+
+      - name: Verify source MP3 exists in repo (exactly one)
+        shell: bash
+        run: |
+          shopt -s nullglob
+          FILES=(audio_inputs/*.mp3)
+          COUNT=${#FILES[@]}
+
+          if (( "$COUNT" != 1 )); then
+            echo "::error::One and only one MP3 file must exist in audio_inputs/. Found: $COUNT" >&2
+            exit 1
+          fi
+          echo "Using MP3 file: ${FILES[0]}"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Upload MP3 to S3 (triggers Lambda)
+        shell: bash
+        run: |
+          FILE_PATH=$(ls audio_inputs/*.mp3)
+          FILE_NAME=$(basename "$FILE_PATH")
+          aws s3 cp "$FILE_PATH" "s3://${{ secrets.S3_BUCKET }}/audio_inputs/$FILE_NAME" \
+            --metadata env=${{ steps.tier.outputs.TIER }}
