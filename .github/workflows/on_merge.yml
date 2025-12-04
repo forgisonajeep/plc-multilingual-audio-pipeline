@@ -1,8 +1,9 @@
-name: Foundational - Merge (prod)
+name: Foundational - main (prod) / process-audio-prod
 
 on:
-  push:
-    branches: [ main ]
+  # Foundational pipeline is frozen after v1-foundational-complete.
+  # This workflow is now manual-only so advanced pipelines can own main pushes.
+  workflow_dispatch:
 
 jobs:
   process-audio-prod:

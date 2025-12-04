@@ -1,8 +1,9 @@
-name: Foundational - PR (beta)
+name: Foundational - PR (beta) / process-audio-beta
 
 on:
-  pull_request:
-    branches: [ main ]
+  # Foundational pipeline is frozen after v1-foundational-complete.
+  # This workflow is now manual-only so advanced pipelines can own PR traffic.
+  workflow_dispatch:
 
 jobs:
   process-audio-beta:
