@@ -2,7 +2,9 @@
 
 A fully automated, multilingual audio processing pipeline using Amazon Transcribe, Amazon Translate, Amazon Polly, and S3 event-driven architecture. GitHub Actions drive CI/CD and environment separation for beta and production runs.
 
-[![Foundational v1](https://img.shields.io/badge/foundational-v1--complete-blue)](https://github.com/forgisonajeep/plc-multilingual-audio-pipeline/tags)
+[![Release v1 – foundational](https://img.shields.io/badge/release-v1--foundational--complete-blue)](https://github.com/forgisonajeep/plc-multilingual-audio-pipeline/tree/v1-foundational-complete)
+[![Release v2 – advanced](https://img.shields.io/badge/release-v2--advanced--complete-purple)](https://github.com/forgisonajeep/plc-multilingual-audio-pipeline/tree/v2-advanced-complete)
+
 [![Foundational PR – beta](https://github.com/forgisonajeep/plc-multilingual-audio-pipeline/actions/workflows/on_pull_request.yml/badge.svg)](../../actions/workflows/on_pull_request.yml)
 [![Foundational Merge – prod](https://github.com/forgisonajeep/plc-multilingual-audio-pipeline/actions/workflows/on_merge.yml/badge.svg)](../../actions/workflows/on_merge.yml)
 [![Advanced – upload audio (S3 event-driven)](https://github.com/forgisonajeep/plc-multilingual-audio-pipeline/actions/workflows/advanced_upload_audio.yml/badge.svg)](../../actions/workflows/advanced_upload_audio.yml)
