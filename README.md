@@ -281,15 +281,70 @@ Create an execution role for the Lambda function (`plc-ml-audio-lambda-2025-role
 - Trust policy: allows `lambda.amazonaws.com`
 - Permissions:
   - Read/write to `plc-multilingual-audio-pipeline-2025` with least privilege
-    - `s3:GetObject`, `s3:PutObject` on:
-      - `audio_inputs/*`
-      - `beta/*`
-      - `prod/*` (reserved for later)
+    - `s3:GetObject`, `s3:PutObject`, `s3:ListBucket` on the bucket and its objects
   - Access to:
-    - `transcribe:StartTranscriptionJob`, `transcribe:DescribeTranscriptionJob`
+    - `transcribe:StartTranscriptionJob`, `transcribe:GetTranscriptionJob`
     - `translate:TranslateText`
     - `polly:SynthesizeSpeech`
   - Basic Lambda logging policy for CloudWatch Logs
+
+#### 8.2.1 IAM policy JSON (least-privilege for this project)
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "S3ReadWrite",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:ListBucket"
+      ],
+      "Resource": [
+        "arn:aws:s3:::plc-multilingual-audio-pipeline-2025",
+        "arn:aws:s3:::plc-multilingual-audio-pipeline-2025/*"
+      ]
+    },
+    {
+      "Sid": "TranscribePermissions",
+      "Effect": "Allow",
+      "Action": [
+        "transcribe:StartTranscriptionJob",
+        "transcribe:GetTranscriptionJob"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "TranslatePermissions",
+      "Effect": "Allow",
+      "Action": [
+        "translate:TranslateText"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "PollyPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "polly:SynthesizeSpeech"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "LambdaLogs",
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+```
 
 ### 8.3 Lambda function: `plc-ml-audio-lambda-2025`
 
